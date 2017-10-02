@@ -77,12 +77,34 @@ module.exports = {
         });
         archive.pipe(writeStream);
         archive.directory(distDir, 'dist');
-        return archive.finalize().then(function() {
-          return {
-            fastbootArchiveName: archiveName,
-            fastbootArchivePath: archivePath
-          };
+
+
+        var promise = new RSVP.Promise(function(resolve, reject) {
+
+          archive.finalize().then(function() {
+            console.log('in finalize promise')
+
+          });
+          
+          writeStream.on('close', function() {
+              console.log('close calbbac')
+              resolve({
+                fastbootArchiveName: archiveName,
+                fastbootArchivePath: archivePath
+              });
+
+          });
+
+          archive.on('error', function(err) {
+            reject(err);
+          });
+
         });
+
+
+        return promise;
+
+
       }
     });
 

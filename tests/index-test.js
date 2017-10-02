@@ -154,10 +154,13 @@ describe('fastboot-app-server plugin', function() {
       });
 
       it('adds fastbootArchiveName and fastbootArchivePath info to the deplyoment context', function() {
-        let info = plugin.didPrepare(context);
 
-        assert.equal(info.fastbootArchiveName, 'dist-1234.zip');
-        assert.equal(info.fastbootArchivePath, 'tmp/fastboot-deploy/dist-1234.zip');
+
+          plugin.didPrepare(context).then(function(info) {
+            console.log('teste')
+            assert.equal(info.fastbootArchiveName, 'dist-1234.zip');
+            assert.equal(info.fastbootArchivePath, 'tmp/fastboot-deploy/dist-1234.zip');
+          });
       });
     });
   });
