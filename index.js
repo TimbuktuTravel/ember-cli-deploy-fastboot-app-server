@@ -3,7 +3,7 @@
 
 const fs         = require('fs');
 const path       = require('path');
-const AdmZip     = require('adm-zip');
+var archiver     = require('archiver');
 const BasePlugin = require('ember-cli-deploy-plugin');
 const rimraf     = require('rimraf');
 const RSVP       = require('rsvp');
@@ -69,14 +69,20 @@ module.exports = {
         let archiveName = fastbootArchivePrefix+revisionKey+'.zip';
         let archivePath = path.join(fastbootDistDir, archiveName);
 
-        let zip = new AdmZip();
-        zip.addLocalFolder(distDir, 'dist');
-        zip.writeZip(archivePath);
-
-        return {
-          fastbootArchiveName: archiveName,
-          fastbootArchivePath: archivePath
-        };
+        let writeStream = fs.createWriteStream(archivePath);
+        var archive = archiver('zip', {
+          zlib: {
+            level: 9
+          }
+        });
+        archive.pipe(writeStream);
+        archive.directory(distDir, 'dist');
+        return archive.finalize().then(function() {
+          return {
+            fastbootArchiveName: archiveName,
+            fastbootArchivePath: archivePath
+          };
+        });
       }
     });
 
