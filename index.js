@@ -78,33 +78,20 @@ module.exports = {
         archive.pipe(writeStream);
         archive.directory(distDir, 'dist');
 
-
         var promise = new RSVP.Promise(function(resolve, reject) {
-
-          archive.finalize().then(function() {
-            console.log('in finalize promise')
-
-          });
-          
+          archive.finalize();
           writeStream.on('close', function() {
-              console.log('close calbbac')
               resolve({
                 fastbootArchiveName: archiveName,
                 fastbootArchivePath: archivePath
               });
-
           });
-
           archive.on('error', function(err) {
             reject(err);
           });
-
         });
 
-
         return promise;
-
-
       }
     });
 
